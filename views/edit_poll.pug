@@ -1,0 +1,14 @@
+extends layout
+
+block content
+	h1 #{poll.title}
+	form(method="POST", action="/polls/edit/"+poll._id)
+		#form-group 
+			label Title:
+			input.form-control(name="title",type="text",value=poll.title)
+		#form-group
+			each option, i in options
+				label  Option:#{i+1}
+				input.form-control(type="text", name="option"+i,value=option.option)
+		br
+		input.btn.btn-primary(type="submit",value="Submit")

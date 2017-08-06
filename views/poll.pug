@@ -1,0 +1,43 @@
+extends layout
+
+block content
+	.container
+		.central
+			h1(data-id=options) #{poll.title}
+			div.row
+				div.col-md-6
+					form(method="POST", action="/polls/vote/"+poll._id)
+						#form-group
+							ul.list-group
+								each option, i in options
+									li.list-group-item
+										input(type="radio",name="answer" ,value=i)
+										label(for='option1'+i) &nbsp; #{option.option}
+						br
+						input.btn.btn-primary.vote-poll(type="submit" ,value ="VOTE!") 
+					br
+					if user
+						if user.id == poll.author
+							a.btn.btn-default(href="/polls/edit/"+poll._id) Edit
+							a.btn.btn-danger.delete-poll(href="#",data-id=poll._id) Delete
+					br
+				div.col-md-6.canvas-result
+					canvas#myChart(width='300', height='300')
+			div.row
+				div.social-buttons
+							h4 Share:
+							a.btn.btn-fb(href='https://www.facebook.com/sharer/sharer.php?=/http://localhost:3000/polls/'+poll._id,target="_blank")
+								i.fa.fa-facebook
+								| Facebook
+							a.btn.btn-tw(href='https://twitter.com/intent/tweet?text=/http://localhost:3000/polls/'+poll._id,target="_blank")
+								i.fa.fa-twitter
+								| Twitter
+
+
+
+
+
+
+
+
+

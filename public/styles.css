@@ -1,0 +1,55 @@
+.myNav{
+  background: #090909
+  }
+
+.alert-error{
+	color:#a94442;
+	background-color: #f2dede;
+	border: #ebccd1;
+}
+
+.alert-success_msg{
+	color:#3c763d;
+	background-color: #dff0d8;
+	border: #d6e9c6;
+}
+
+  .central{
+  background-color: #f7f7fd;
+  margin:auto;
+  padding:30px;
+  width:60%;
+}
+
+@media(max-width:768px){
+ .central{
+  width:100%;
+}
+}
+
+  .btn-fb{
+    color: #fff;
+    background-color:#3b5998;
+}
+.btn-fb:hover{
+    color: #fff;
+    background-color:#496ebc 
+}
+.btn-tw{
+    color: #fff;
+    background-color:#55acee;
+}
+.btn-tw:hover{
+    color: #fff;
+    background-color:#59b5fa;
+ }
+ 
+ .social-buttons a{
+    width: 49%;
+}
+
+.login-button{
+    width: 99%;
+}
+
+

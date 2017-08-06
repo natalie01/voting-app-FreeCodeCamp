@@ -1,0 +1,14 @@
+extends layout
+
+block content
+	div.central
+		h1 {title}
+		ul.list-group
+				each poll, i in polls
+					li.list-group-item
+						a(href="/polls/"+poll._id) #{poll.title}		
+
+
+
+
+
