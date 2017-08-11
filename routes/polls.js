@@ -1,3 +1,4 @@
+
 var  express = require('express');
 var router = express.Router();
 // Poll Model
@@ -94,7 +95,7 @@ router.post('/edit/:id', function(req, res){
 	
 
 
-	Poll.update(query, poll, function(err){
+Poll.update(query, poll, function(err){
 	if(err){
 	console.log(err);
 	return;
@@ -107,52 +108,92 @@ router.post('/edit/:id', function(req, res){
 
 //vote a poll
 router.post('/vote/:id',function(req,res){
-console.log(req.session);
-    if ( !req.session.views){
-    //if user has not voted this poll yet
-      
-    if(req.body.answer === undefined){
-		Poll.findById(req.params.id, function(err,poll){
-		if(err) return err;
-	
-		var poll_options = poll.options;
-		poll_options = poll_options.filter(function(option){
-		return option.option !=='';
-		})
-		req.flash('info', "You didn't choose an option");
-		res.render('poll', {
-		poll:poll,
-		options:poll_options, 
-		errors:["You didn't choose an option"]
-		});
-		});
-	}else{
-	let choice = Number(req.body.answer);
-	
-	let query = {_id:req.params.id ,"options.op":choice};
+  
+  if(req.user !== undefined){
+    console.log(req.user._id);
+    //user is authenticated and logged in
+    let user_query = {_id:req.user._id};
+    
+    //find out if user has already voted this poll
+    User.findById(req.user._id ,function(err,user){
+      let result = user.pollsVoted;
+      if(err) return err;
+    
+      if(user.pollsVoted.indexOf(req.params.id)!== -1){
+    
+        req.flash('error','you already voted this poll!');
+        //if user has voted redirect
+        res.redirect('/');
+      } else{
+        
+       //else let user vote
+     
+        votePoll();
+       }
+       
+    })
+    
+    }else{  
+      //user not authenticated
+      if (!req.session.views){
+      //if user has not voted this poll yet
+      votePoll(); //let user vote
+      //increment after user has voted      
+      req.session.views = 1;
 
-	let inc_vote = {$inc :{"options.$.votes":1}};
-	Poll.update(query,inc_vote)
-	.exec(function(err,poll){
-		if(err){
-			return err;
-		}else{
-		req.flash('success', 'Voted!');
-		res.redirect('/');
-		}	
-	})
-}
-      
-//increment after user has voted      
-req.session.views = 1;
-      
-}else{
-    //user has already voted this poll
-    req.session.views += 1;
-  req.flash('error','you already voted this poll!');
-  res.redirect('/');
-  }
-	
+      }else{
+      //user has already voted this poll
+      req.session.views += 1;
+      req.flash('error','you already voted this poll!');
+      res.redirect('/');
+      }
+  } 
+  
+    function votePoll(){
+    if(req.body.answer === undefined){
+      Poll.findById(req.params.id, function(err,poll){
+        if(err) return err;
+
+        var poll_options = poll.options;
+        poll_options = poll_options.filter(function(option){
+        return option.option !=='';
+        })
+        req.flash('info', "You didn't choose an option");
+        res.render('poll', {
+          poll:poll,
+          options:poll_options, 
+          errors:["You didn't choose an option"]
+        });
+		  });
+	  }else{
+      let choice = Number(req.body.answer);
+
+      let query = {_id:req.params.id ,"options.op":choice};
+
+      let inc_vote = {$inc :{"options.$.votes":1}};
+    
+      Poll.update(query,inc_vote)
+      .exec(function(err,poll){
+        if(err){
+          return err;
+          }else{
+           if(req.user !== undefined){
+            //user is authenticated and logged in
+              let user_query = {_id:req.user._id};
+              let push_vote ={ $push:{ "pollsVoted": req.params.id}};
+            
+              User.update(user_query,push_vote,function(err){
+                if(err) return err;
+  
+                });
+              }
+    
+          req.flash('success', 'Voted!');
+          res.redirect('/');
+          }	
+         });
+      }
+    }  
 });
 
 
